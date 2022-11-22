@@ -60,3 +60,33 @@ imageWrapperDom.style.transform = `scale(${1 + percent})`;
 collectButtonDom.style.transform = `translate3d(0, ${newY}px, 0)`;
 ```
 
+8.给整个背景添加遮罩
+
+```css
+postion: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+right: 0;
+background-color: rgba(212, 68, 57, .5);
+```
+
+9.扩大可点击区域
+
+```css
+position: relative;
+&:before{
+  content: '';
+  position: absolute;
+  top: -10px; bottom: -10px; left: -10px; right: -10px;
+};
+```
+
+10.一行文字溢出...表示
+
+```css
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+```
+

@@ -2,6 +2,8 @@ S：
 
 代码规范化、统一格式
 
+环境：node v16.13.0，npm v8.1.0，vue v3.2.37，vite v3.0.7
+
 T：
 
 配置eslint、prettier
@@ -90,5 +92,70 @@ ctrl+shift+P打开workspace配置
 
 重启VS
 
+##### 4.git规范
 
+- husky：操作git钩子的工具
+
+```shell
+npx husky add .husky/pre-commit "pnpm run lint"
+```
+
+lint命令：
+
+```shell
+"lint": "eslint --ext .ts,.tsx,.vue src", # --fix自动修复，但不会把修复后的结果纳入当前commit
+```
+
+
+
+此时进行commit操作都会运行lint命令进行代码规范。
+
+（4）配置push之前通过单元测试的钩子
+
+```shell
+npx husky add .husky/pre-push "pnpm run test:run"
+```
+
+由于 vitest 默认是以伺服模式运行，所以需要写一个专门的脚本让测试运行在伺服模式下 packages.json
+
+```shell
+"scripts": {
+	"test:run": "vitest run",
+},
+```
+
+（5）校验commit message规范
+
+- 安装commitlint
+
+```shell
+pnpm i -d @commitlint/config-conventional@"17.0.2" @commitlint/cli@"17.0.2"
+```
+
+- 根目录新建commitlint.config.js
+
+```shell
+module.exports = {
+  extends: ["@commitlint/config-conventional"],
+};
+```
+
+- 配置commitlint脚本
+
+```shell
+npx husky add .husky/commit-msg ""
+```
+
+修改.husky/commit-msg
+
+```shell
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx --no -- commitlint --edit "$1"
+```
+
+
+
+#### Complete！！
 
