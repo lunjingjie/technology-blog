@@ -1,0 +1,98 @@
+#### JSX的转换过程
+
+render函数 -> React.createElement -> Fiber节点
+
+#### Babel处理原理和输出
+
+1.JSX会通过React.createElement方法，把JSX元素节点通过Babel编译成React Element形式
+
+```javascript
+React.createElement(type, [prop], [...children])
+// type: 如果是组件类型，会传入组件对应的类或函数；如果是 dom 元素类型，传入 div 或者 span 之类的字符串
+// prop: 一个对象，在 dom 类型中为标签属性，在组件类型中为 props
+// children: 依次为 children，根据顺序排列
+```
+
+2.老版本中引入React的作用
+
+- 因为 jsx 在被 babel 编译后，写的 jsx 会变成上述 React.createElement 形式，所以需要引入 React，防止找不到 React 引起报错
+
+3.新版不需要引入
+
+编译后自动引入
+
+```javascript
+import { jsx as _jsx } from "react/jsx-runtime";
+import { jsxs as _jsxs } from "react/jsx-runtime";
+```
+
+需要我们在 .babelrc 设置 runtime: automatic 
+
+```json
+"presets": [    
+    ["@babel/preset-react",{
+    "runtime": "automatic"
+    }]     
+],
+```
+
+
+
+#### JSX变成Fiber结构
+
+每个React element对象的每一个子节点都会形成一个与之对应的Fiber对象，然后通过sibling、return、child把每一个Fiber对象联系起来。
+
+React element对应的Fiber对象的tag（种类）
+
+```javascript
+export const FunctionComponent = 0;       // 函数组件
+export const ClassComponent = 1;          // 类组件
+export const IndeterminateComponent = 2;  // 初始化的时候不知道是函数组件还是类组件 
+export const HostRoot = 3;                // Root Fiber 可以理解为根元素 ， 通过reactDom.render()产生的根元素
+export const HostPortal = 4;              // 对应  ReactDOM.createPortal 产生的 Portal 
+export const HostComponent = 5;           // dom 元素 比如 <div>
+export const HostText = 6;                // 文本节点
+export const Fragment = 7;                // 对应 <React.Fragment> 
+export const Mode = 8;                    // 对应 <React.StrictMode>   
+export const ContextConsumer = 9;         // 对应 <Context.Consumer>
+export const ContextProvider = 10;        // 对应 <Context.Provider>
+export const ForwardRef = 11;             // 对应 React.ForwardRef
+export const Profiler = 12;               // 对应 <Profiler/ >
+export const SuspenseComponent = 13;      // 对应 <Suspense>
+export const MemoComponent = 14;          // 对应 React.memo 返回的组件
+```
+
+#### 自定义操控render
+
+1.扁平化children
+
+```
+const flatChildren = React.children.toArray(children); // 深层次flat数组
+```
+
+2.验证是否为React.element元素节点
+
+```javascript
+React.isValidElement() // 验证
+React.children.forEach(arr, () => {}); // 同样具备扁平化数组效果
+```
+
+3.克隆React element
+
+```新的
+React.cloneElement(reactElement, {}, ...newChildren); // 复制并返回新的React.element对象
+```
+
+
+
+#### Babel解析JSX流程
+
+1.@babel/plugin-syntax-jsx 和 @babel/plugin-transform-react-jsx
+
+JSX 语法实现来源于这两个 babel 插件：
+
+- @babel/plugin-syntax-jsx ： 使用这个插件，能够让 Babel 有效的解析 JSX 语法。
+- @babel/plugin-transform-react-jsx ：这个插件内部调用了 @babel/plugin-syntax-jsx，可以把 React JSX 转化成 JS 能够识别的 createElement 格式。
+
+#### 总结
+
