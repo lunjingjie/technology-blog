@@ -38,3 +38,6 @@
 - 路由懒加载
 
 - 使用scu，memo或者pureComponent避免不必要的渲染
+
+9.白屏优化
+
